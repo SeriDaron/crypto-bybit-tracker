@@ -6,8 +6,7 @@ export async function GET() {
     const timeoutId = setTimeout(() => controller.abort(), 4000); 
 
     // Clean, standard production URL
-    const response = await fetch('https://bytick.com', {
-      next: { revalidate: 5 },
+    const response = await fetch('https://api.bytick.com/v5/market/tickers?category=spot', {      next: { revalidate: 5 },
       signal: controller.signal
     });
 
