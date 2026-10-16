@@ -6,11 +6,10 @@ import { TrendingUp, RefreshCw, AlertTriangle, CheckCircle } from 'lucide-react'
 interface CryptoTicker {
   symbol: string;
   price: string;
-  volume24h: string;
-  high24h: string;
-  low24h: string;
+  change24h: string;
+  volume: string;
   anomalyScore: number;
-  status: string;
+  isFallback: boolean;
 }
 
 export default function TrackerDashboard() {
@@ -25,11 +24,39 @@ export default function TrackerDashboard() {
     setError(null);
     try {
       const response = await fetch('/api/bybit');
-      const data = await response.json();
+      const res = await response.json();
       
-      if (data.result) {
-        setTickers(data.result);
-        setIsFallback(!!data.fallback);
+      if (res.success && res.data) {
+        const mappedData = res.data.map((item: any) => {
+          const changePercent = Math.abs(parseFloat(item.change24h || '0'));
+          const calculatedScore = Math.min(Math.round((changePercent / 1.5) * 10) / 10, 10);
+          return {
+            symbol: item.symbol,
+            price: item.price,
+            change24h: item.change24h,
+            volume: item.volume,
+            anomalyScore: calculatedScore || 1.2,
+            isFallback: false
+          };
+        });
+        setTickers(mappedData);
+        setIsFallback(false);
+        setLastUpdated(new Date().toLocaleTimeString());
+      } else if (!res.success && res.data) {
+        const mappedFallback = res.data.map((item: any) => {
+          const changePercent = Math.abs(parseFloat(item.change24h || '0'));
+          const calculatedScore = Math.min(Math.round((changePercent / 1.5) * 10) / 10, 10);
+          return {
+            symbol: item.symbol,
+            price: item.price,
+            change24h: item.change24h,
+            volume: item.volume,
+            anomalyScore: calculatedScore || 1.2,
+            isFallback: true
+          };
+        });
+        setTickers(mappedFallback);
+        setIsFallback(true);
         setLastUpdated(new Date().toLocaleTimeString());
       } else {
         setError('Data formatting anomaly detected.');
@@ -46,12 +73,10 @@ export default function TrackerDashboard() {
     const interval = setInterval(fetchMarketData, 15000);
     return () => clearInterval(interval);
   }, []);
-
   return (
     <div className="min-h-screen bg-[#0B0F19] text-[#F3F4F6] p-6 font-sans">
       <div className="max-w-7xl mx-auto">
         
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-[#1F2937] pb-6 mb-8 gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -80,7 +105,6 @@ export default function TrackerDashboard() {
           </div>
         </div>
 
-        {/* Dynamic State Alert */}
         {isFallback && (
           <div className="bg-[#1E3A8A]/30 border border-[#3B82F6]/40 text-[#93C5FD] p-4 rounded-xl flex items-start gap-3 mb-6 text-xs">
             <CheckCircle className="text-[#3B82F6] h-5 w-5 shrink-0" />
@@ -90,7 +114,6 @@ export default function TrackerDashboard() {
           </div>
         )}
 
-        {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-[#111827] border border-[#1F2937] p-5 rounded-xl">
             <h3 className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wider mb-2">Monitored Assets</h3>
@@ -105,15 +128,20 @@ export default function TrackerDashboard() {
           <div className="bg-[#111827] border border-[#1F2937] p-5 rounded-xl">
             <h3 className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wider mb-2">Processing State</h3>
             <div className="flex items-center gap-2 mt-1">
-              <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse"></span>
-              <p className="text-sm font-semibold font-mono text-[#10B981]">
+              <span className={`h-2 w-2 rounded-full ${isFallback ? 'bg-[#F59E0B]' : 'bg-[#10B981]'} animate-pulse`}></span>
+              <p className={`text-sm font-semibold font-mono ${isFallback ? 'text-[#F59E0B]' : 'text-[#10B981]'}`}>
                 {isFallback ? 'Demo Mode Active' : 'Live Data Inbound'}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Table */}
+        {error && (
+          <div className="bg-[#7F1D1D]/20 border border-[#EF4444]/40 text-[#FCA5A5] p-4 rounded-xl text-xs mb-6">
+            {error}
+          </div>
+        )}
+
         <div className="bg-[#111827] border border-[#1F2937] rounded-xl overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -121,7 +149,7 @@ export default function TrackerDashboard() {
                 <tr className="bg-[#1F2937]/50 border-b border-[#1F2937] text-xs font-semibold text-[#9CA3AF] uppercase tracking-wider">
                   <th className="py-4 px-6">Asset</th>
                   <th className="py-4 px-6 text-right">Price (USD)</th>
-                  <th className="py-4 px-6 text-right">24H Low / High</th>
+                  <th className="py-4 px-6 text-right">24H Change</th>
                   <th className="py-4 px-6 text-right">24H Volume</th>
                   <th className="py-4 px-6 text-center">Anomaly Index</th>
                   <th className="py-4 px-6 text-right">State</th>
@@ -139,11 +167,13 @@ export default function TrackerDashboard() {
                   tickers.map((ticker) => (
                     <tr key={ticker.symbol} className="hover:bg-[#1F2937]/30 transition-colors">
                       <td className="py-4 px-6 font-bold text-[#F3F4F6] text-base">{ticker.symbol}</td>
-                      <td className="py-4 px-6 text-right font-semibold text-[#10B981]">\${ticker.price}</td>
-                      <td className="py-4 px-6 text-right text-xs text-[#9CA3AF]">
-                        \${ticker.low24h} / <span className="text-[#F3F4F6]">\${ticker.high24h}</span>
+                      <td className="py-4 px-6 text-right font-semibold text-[#10B981]">${ticker.price}</td>
+                      <td className={`py-4 px-6 text-right text-xs font-bold ${parseFloat(ticker.change24h) >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
+                        {parseFloat(ticker.change24h) >= 0 ? '+' : ''}{ticker.change24h}%
                       </td>
-                      <td className="py-4 px-6 text-right text-xs text-[#D1D5DB]">{ticker.volume24h}</td>
+                      <td className="py-4 px-6 text-right text-xs text-[#D1D5DB]">
+                        {parseFloat(ticker.volume).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                      </td>
                       <td className="py-4 px-6">
                         <div className="flex flex-col items-center gap-1 max-w-[120px] mx-auto">
                           <span className={`text-xs font-bold ${ticker.anomalyScore > 5.0 ? 'text-[#EF4444]' : 'text-[#3B82F6]'}`}>
@@ -164,7 +194,7 @@ export default function TrackerDashboard() {
                             : 'bg-[#064E3B]/20 text-[#A7F3D0] border-[#10B981]/30'
                         }`}>
                           {ticker.anomalyScore > 5.0 ? <AlertTriangle className="h-3 w-3" /> : <CheckCircle className="h-3 w-3" />}
-                          {ticker.status}
+                          {ticker.anomalyScore > 5.0 ? 'Anomaly' : 'Normal'}
                         </span>
                       </td>
                     </tr>
