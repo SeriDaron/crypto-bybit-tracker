@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nexus.Crypto — Dynamic Volatility Anomaly Scanner
 
-## Getting Started
+A production-grade, high-performance Web3 data visualization dashboard built with **Next.js 15+ (App Router)**, **TypeScript**, and **Tailwind CSS**. This engine interfaces directly with the official public **Bybit V5 REST API architecture**, performing real-time computational scans to detect volume spikes, asset discrepancies, and market volatility anomalies.
 
-First, run the development server:
+## 🚀 Key Architectural Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+*   **App Router Architecture:** Implements a decoupled data fetching model utilizing strict Client-Server component boundaries.
+*   **Defensive Production Engineering:** Integrated with a custom `AbortController` timeout safety layer and an automated mock fallback state to ensure 100% application uptime.
+*   **Real-Time Data Pipelines:** Asynchronously streams data packets directly from distributed digital asset exchange nodes with automated UI polling sync cascades.
+*   **Advanced Metric Math:** Calculates customized real-time market anomaly indexes based on dynamic 24-hour liquidity and transacted asset volume weights.
+*   **Premium Dark UI Viewport:** Engineered with structural responsive tabular grids, dynamic load state animations, and color-coded status badging powered by `lucide-react`.
+
+## 🛠️ Tech Stack & Dependencies
+
+*   **Framework:** Next.js 15.1.9 (React 19 ecosystem compatible)
+*   **Language:** TypeScript (Strict type-safe structures)
+*   **Styles & Icons:** Tailwind CSS, Lucide React
+
+```text
+.
+├── src/
+│   └── app/
+│       ├── api/bybit/route.ts       # Defensive server-side connection node
+│       ├── components/TrackerDashboard.tsx # Data parsing reactive core interface
+│       ├── globals.css              # Global Tailwind configuration layer
+│       ├── layout.tsx               # Root view wrapper component
+│       └── page.tsx                 # Main application entry canvas
+└── package.json                     # Application package manifests
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ⚙️ Local Setup Instructions
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Clone the dashboard core repository:**
+   ```bash
+   git clone https://github.com
+   cd crypto-bybit-tracker
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Deploy structural locked package dependencies:**
+   ```bash
+   npm install
+   ```
 
-## Learn More
+3. **Boot the Local Webpack Engine Context:**
+   ```bash
+   npm run dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. **Access the Local Analytics Viewport:**
+   Open your target browser container and enter: `http://localhost:3000`
