@@ -1,50 +1,48 @@
-# Nexus.Crypto — Dynamic Volatility Anomaly Scanner
+# Crypto Volatility Tracker (Bybit)
 
-A production-grade, high-performance Web3 data visualization dashboard built with **Next.js 15+ (App Router)**, **TypeScript**, and **Tailwind CSS**. This engine interfaces directly with the official public **Bybit V5 REST API architecture**, performing real-time computational scans to detect volume spikes, asset discrepancies, and market volatility anomalies.
+A real-time crypto market dashboard that pulls prices from the public **Bybit V5 API** and flags volatility anomalies. Built with **Next.js (App Router)**, **TypeScript**, and **Tailwind CSS**.
 
-## 🚀 Key Architectural Features
+> **Reliability note:** if Bybit is unreachable (network, region restrictions), the API route returns a static fallback snapshot and the UI labels it as such, so the dashboard never shows an empty state.
 
-*   **App Router Architecture:** Implements a decoupled data fetching model utilizing strict Client-Server component boundaries.
-*   **Defensive Production Engineering:** Integrated with a custom `AbortController` timeout safety layer and an automated mock fallback state to ensure 100% application uptime.
-*   **Real-Time Data Pipelines:** Asynchronously streams data packets directly from distributed digital asset exchange nodes with automated UI polling sync cascades.
-*   **Advanced Metric Math:** Calculates customized real-time market anomaly indexes based on dynamic 24-hour liquidity and transacted asset volume weights.
-*   **Premium Dark UI Viewport:** Engineered with structural responsive tabular grids, dynamic load state animations, and color-coded status badging powered by `lucide-react`.
+## Features
 
-## 🛠️ Tech Stack & Dependencies
+- **Live market data:** a server-side API route proxies the Bybit V5 tickers endpoint (no API key needed).
+- **Anomaly score:** a 0-10 index derived from the 24h price change.
+- **Auto-refresh:** the dashboard polls every 15 seconds and shows the last update time.
+- **Graceful fallback:** clear error and fallback states, never a blank screen.
+- **Dark UI:** responsive table with color-coded status badges (Lucide icons).
 
-*   **Framework:** Next.js 15.1.9 (React 19 ecosystem compatible)
-*   **Language:** TypeScript (Strict type-safe structures)
-*   **Styles & Icons:** Tailwind CSS, Lucide React
+## Tech Stack
+
+Next.js 15 · React 19 · TypeScript · Tailwind CSS 3 · Lucide React
+
+## Project Structure
 
 ```text
-.
-├── src/
-│   └── app/
-│       ├── api/bybit/route.ts       # Defensive server-side connection node
-│       ├── components/TrackerDashboard.tsx # Data parsing reactive core interface
-│       ├── globals.css              # Global Tailwind configuration layer
-│       ├── layout.tsx               # Root view wrapper component
-│       └── page.tsx                 # Main application entry canvas
-└── package.json                     # Application package manifests
+src/app/
+├── api/bybit/route.ts             # Bybit proxy with fallback data
+├── components/TrackerDashboard.tsx  # Data mapping, polling, UI
+├── layout.tsx
+└── page.tsx
 ```
 
-## ⚙️ Local Setup Instructions
+## Getting Started
 
-1. **Clone the dashboard core repository:**
-   ```bash
-   git clone https://github.com
-   cd crypto-bybit-tracker
-   ```
+```bash
+git clone https://github.com/SeriDaron/crypto-bybit-tracker.git
+cd crypto-bybit-tracker
+npm install
+npm run dev
+```
 
-2. **Deploy structural locked package dependencies:**
-   ```bash
-   npm install
-   ```
+Open [http://localhost:3000](http://localhost:3000).
 
-3. **Boot the Local Webpack Engine Context:**
-   ```bash
-   npm run dev
-   ```
+## Extending It
 
-4. **Access the Local Analytics Viewport:**
-   Open your target browser container and enter: `http://localhost:3000`
+- Add more trading pairs or a symbol selector.
+- Stream data via WebSocket instead of polling.
+- Add price alerts (Telegram / email) and historical charts.
+
+## Need something similar?
+
+I build trading dashboards, data tools, and API integrations. Feel free to reach out.
