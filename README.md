@@ -4,6 +4,10 @@ A real-time crypto market dashboard that pulls prices from the public **Bybit V5
 
 > **Reliability note:** if Bybit is unreachable (network, region restrictions), the API route returns a static fallback snapshot and the UI labels it as such, so the dashboard never shows an empty state.
 
+## Screenshot
+
+![Crypto volatility tracker with anomaly index table](docs/screenshot.png)
+
 ## Features
 
 - **Live market data:** a server-side API route proxies the Bybit V5 tickers endpoint (no API key needed).
