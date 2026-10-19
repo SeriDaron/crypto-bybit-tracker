@@ -2,6 +2,8 @@
 
 A real-time crypto market dashboard that pulls prices from the public **Bybit V5 API** and flags volatility anomalies. Built with **Next.js (App Router)**, **TypeScript**, and **Tailwind CSS**.
 
+**Live demo:** [crypto-bybit-tracker.vercel.app](https://crypto-bybit-tracker.vercel.app)
+
 > **Reliability note:** if Bybit is unreachable (network, region restrictions), the API route returns a static fallback snapshot and the UI labels it as such, so the dashboard never shows an empty state.
 
 ## Screenshot
