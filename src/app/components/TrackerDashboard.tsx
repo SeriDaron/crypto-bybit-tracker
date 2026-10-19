@@ -12,6 +12,27 @@ interface CryptoTicker {
   isFallback: boolean;
 }
 
+interface RawTicker {
+  symbol: string;
+  price: string;
+  change24h?: string;
+  volume: string;
+}
+
+const toTickers = (items: RawTicker[], isFallback: boolean): CryptoTicker[] =>
+  items.map((item) => {
+    const changePercent = Math.abs(parseFloat(item.change24h || '0'));
+    const calculatedScore = Math.min(Math.round((changePercent / 1.5) * 10) / 10, 10);
+    return {
+      symbol: item.symbol,
+      price: item.price,
+      change24h: item.change24h ?? '0',
+      volume: item.volume,
+      anomalyScore: calculatedScore || 1.2,
+      isFallback,
+    };
+  });
+
 export default function TrackerDashboard() {
   const [tickers, setTickers] = useState<CryptoTicker[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -27,41 +48,19 @@ export default function TrackerDashboard() {
       const res = await response.json();
       
       if (res.success && res.data) {
-        const mappedData = res.data.map((item: any) => {
-          const changePercent = Math.abs(parseFloat(item.change24h || '0'));
-          const calculatedScore = Math.min(Math.round((changePercent / 1.5) * 10) / 10, 10);
-          return {
-            symbol: item.symbol,
-            price: item.price,
-            change24h: item.change24h,
-            volume: item.volume,
-            anomalyScore: calculatedScore || 1.2,
-            isFallback: false
-          };
-        });
+        const mappedData = toTickers(res.data, false);
         setTickers(mappedData);
         setIsFallback(false);
         setLastUpdated(new Date().toLocaleTimeString());
       } else if (!res.success && res.data) {
-        const mappedFallback = res.data.map((item: any) => {
-          const changePercent = Math.abs(parseFloat(item.change24h || '0'));
-          const calculatedScore = Math.min(Math.round((changePercent / 1.5) * 10) / 10, 10);
-          return {
-            symbol: item.symbol,
-            price: item.price,
-            change24h: item.change24h,
-            volume: item.volume,
-            anomalyScore: calculatedScore || 1.2,
-            isFallback: true
-          };
-        });
+        const mappedFallback = toTickers(res.data, true);
         setTickers(mappedFallback);
         setIsFallback(true);
         setLastUpdated(new Date().toLocaleTimeString());
       } else {
         setError('Data formatting anomaly detected.');
       }
-    } catch (err: unknown) {
+    } catch {
       setError('Localized execution environment latency.');
     } finally {
       setLoading(false);

@@ -1,5 +1,12 @@
 import { NextResponse } from 'next/server';
 
+interface BybitTicker {
+  symbol: string;
+  lastPrice: string;
+  price24hPcnt: string;
+  volume24h: string;
+}
+
 export async function GET() {
   const targetSymbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'XRPUSDT', 'LINKUSDT'];
 
@@ -30,8 +37,8 @@ export async function GET() {
     if (data.retCode !== 0 || !data.result?.list) throw new Error();
 
     const formattedData = data.result.list
-      .filter((ticker: any) => targetSymbols.includes(ticker.symbol))
-      .map((ticker: any) => ({
+      .filter((ticker: BybitTicker) => targetSymbols.includes(ticker.symbol))
+      .map((ticker: BybitTicker) => ({
         symbol: ticker.symbol,
         price: ticker.lastPrice,
         change24h: (parseFloat(ticker.price24hPcnt) * 100).toFixed(2),
@@ -42,7 +49,7 @@ export async function GET() {
 
     return NextResponse.json({ success: true, data: formattedData });
 
-  } catch (error) {
+  } catch {
     // Safe auto-fallback if Bybit is unreachable locally
     return NextResponse.json({ success: false, data: fallbackData });
   }
